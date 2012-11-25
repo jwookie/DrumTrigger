@@ -5,7 +5,7 @@ FileLoadAndSavePopup{
 	var controller;
 	var popupType;
 
-	var saveSongButton,filenameText,loadSongButton;
+	var saveSongButton,filenameText,loadSongButton,fileList;
 
 	*new{|window,controller,type|
 	^super.new.initSavePopup(window,controller,type);
@@ -20,9 +20,9 @@ FileLoadAndSavePopup{
 
 		//Rect Point
 		xpos = mainWindow.bounds.leftTop.x +((mainWindow.bounds.width - 200)*0.5);
-		ypos = mainWindow.bounds.leftTop.y + 300;
+		ypos = mainWindow.bounds.leftTop.y + 200;
 
-		popupWindow = Window.new(popupType + "Song",Rect(xpos, ypos, 200, 150)).front;
+		popupWindow = Window.new(popupType + "Song",Rect(xpos, ypos, 200, 280)).front;
 		popupWindow.alwaysOnTop = true;
 		//popupWindow = Window.new("Save Song",point.x +(width - 200)*0.5,point.y+100,200,150).front;
 
@@ -40,6 +40,10 @@ FileLoadAndSavePopup{
 			.action_{|v| controller.onLoadSong(filenameText.value);this.closePopup;
 			}
 		});
+
+		fileList = ListView.new(popupWindow, Rect(10,90,180,180));
+		fileList.items = controller.getFileList.asArray;
+		fileList.action = {arg v;filenameText.string = fileList.items[v.value]};
 
 	}
 

@@ -97,6 +97,48 @@ FileSaveController{
 		controller.setSongTitle(name);
 
 		(name + "Saved").postln;
+
+		this.updateSavedSongList(name);
+	}
+
+	updateSavedSongList{|name|
+		var listFile,saveFilename,files,xml,data;
+
+		saveFilename = BumTrigger.static_XML_FOLDER_PATH ++ BumTrigger.static_XML_FILE_LIST ++ ".xml";
+
+		xml = DOMDocument.new(saveFilename);
+
+		data = xml.getDocumentElement.getElement("data");
+
+		files = data.getFirstChild;
+
+		this.addCData(xml,files,"file",name);
+
+		//now save file
+		listFile = File(saveFilename, "w");
+		xml.write(listFile); // output to file with default formatting
+		listFile.close;
+	}
+
+	getFileList{
+		var list,saveFilename,file,test,xml,data,newNode;
+
+		saveFilename = BumTrigger.static_XML_FOLDER_PATH ++ BumTrigger.static_XML_FILE_LIST ++ ".xml";
+
+		xml = DOMDocument.new(saveFilename);
+
+		file = xml.getDocumentElement.getElement("data").getElement("files").getFirstChild;
+
+		list = List.new(0);
+		list.add("");//add blank space at top of list
+		while ( { file != nil } , {
+			list.add(file.getFirstChild.getNodeValue);
+			file = file.getNextSibling;
+		});
+
+		list.postln;
+
+		^list;
 	}
 
 	onLoadSong{|name|

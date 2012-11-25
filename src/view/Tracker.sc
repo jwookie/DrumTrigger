@@ -55,10 +55,10 @@ Tracker{
 	}
 
 	setStepTracker{|stepNum|
-		//["setStepTracker",stepNum].postln;
-		stepTrackers[currentStep].background=Color.white;
+		//["setStepTracker",stepNum,currentStep].postln;
+		{stepTrackers[currentStep].background=Color.white;
 		currentStep = stepNum;
-		stepTrackers[currentStep].background=Color.red;
+		stepTrackers[currentStep].background=Color.red}.defer;
 	}
 
 }

@@ -21,14 +21,15 @@ MidiIOController{
 	}
 
 	initMidi{
-		var inPorts = 1;
+		var inPorts = 2;
 		var outPorts = 1;
 		"Initialising MIDI..".postln;
 
 		MIDIClient.init(inPorts,outPorts);
 		// explicitly intialize the client
 		inPorts.do({ arg i;
-			MIDIIn.connect(i, MIDIClient.sources.at(i));
+			i.postln;
+			MIDIIn.connect(i, MIDIClient.sources.at(i).postln);
 		});
 
 		midiOut = MIDIOut(0);
@@ -86,9 +87,9 @@ MidiIOController{
 				});
 
 				//then increment until step is active
-				["STEP ACTIVE ?",sequence.activeSteps[sequence.currentStep]].postln;
+				//["STEP ACTIVE ?",sequence.activeSteps[sequence.currentStep]].postln;
 				while{sequence.activeSteps[sequence.currentStep]==0}{
-					["SEQ STEP ",sequence.currentStep].postln;
+					//["SEQ STEP ",sequence.currentStep].postln;
 					if(sequence.currentStep+1 < Sequence.static_NUM_STEPS,{
 						sequence.currentStep = sequence.currentStep+1;
 						},{
@@ -115,10 +116,9 @@ MidiIOController{
 
 	onMidiIn{|src,chan,num|
 
-		//[chan,num].postln;
 		model.triggerChannel;
 		if(chan == model.triggerChannel, {
-
+			["ON MIDI IN",chan,num].postln;
 			model.getCurrentSection.sequenceList.do{arg val;
 				var actionArray;// = [0];//sequence.onMidiIn;
 				//var index = sequence.sequenceIndex;
@@ -132,7 +132,7 @@ MidiIOController{
 							actionArray = [3];
 							},{
 								if(step.moveSequence == 1,{
-									[step.hitCounter , step.numTrigHits].postln;
+									//[step.hitCounter , step.numTrigHits].postln;
 									if(step.numTrigHits > (step.hitCounter + 1),{
 										actionArray = [2];
 										step.hitCounter = step.hitCounter + 1;

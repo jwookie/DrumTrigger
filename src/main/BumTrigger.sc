@@ -1,6 +1,7 @@
 BumTrigger{
 
 	classvar < static_XML_FOLDER_PATH = "/Users/jonathanbaker/Desktop/test_xml/";
+	classvar < static_XML_FILE_LIST = "save_list";
 	var triggerMain;
 
 	*new{|s|
