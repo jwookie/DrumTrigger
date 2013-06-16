@@ -40,6 +40,9 @@ TriggerController{
 
 	}
 
+
+
+
 	setModel{|trigModel|
 		model = trigModel;
 		projectController.model = model;
@@ -125,6 +128,10 @@ TriggerController{
 
 	setMidiSendChan{|channelNum|
 		model.getCurrentSequence.midiSendChan = channelNum;
+	}
+
+	setMisfireTime{|time|
+		model.getCurrentSequence.misfireTime = time;
 	}
 
 	incrementMidiChan{|moveUp|
@@ -320,7 +327,7 @@ TriggerController{
 
 	changeSection{|sectionIndex|
 		model.currentSection = sectionIndex;
-		gui.projectEditor.sectionTitle.string = model.getCurrentSection.sectionName;
+		{gui.projectEditor.sectionTitle.string = model.getCurrentSection.sectionName}.defer;
 		this.updateSequenceCombos;
 		this.changeSequence(0);
 
@@ -364,7 +371,7 @@ TriggerController{
 	}
 
 	updateSequenceTitle{
-		gui.projectEditor.sequenceTitle.string = model.getCurrentSequence.sequenceName;
+		{gui.projectEditor.sequenceTitle.string = model.getCurrentSequence.sequenceName}.defer;
 	}
 
 	updateSequenceCombos{
@@ -396,6 +403,7 @@ TriggerController{
 		gui.propertiesEditor.midiChanBox.value = model.getCurrentSequence.midiSendChan;
 		gui.propertiesEditor.octaveBox.value = model.getCurrentStep.octave;
 		gui.propertiesEditor.globalOctaveButton.value = model.getCurrentStep.useGlobalOctave;
+		gui.propertiesEditor.misifreTimeBox.value = model.getCurrentSequence.misfireTime;
 		gui.propertiesEditor.noteLengthBox.value = model.getCurrentStep.noteLength;
 		gui.propertiesEditor.numTrigHitsBox.value = model.getCurrentStep.numTrigHits;
 		gui.propertiesEditor.moveSequenceButton.value = model.getCurrentStep.moveSequence;

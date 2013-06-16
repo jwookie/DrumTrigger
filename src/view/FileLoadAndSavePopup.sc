@@ -18,6 +18,9 @@ FileLoadAndSavePopup{
 		controller = initController;
 		popupType = initType;
 
+		//reset save as value
+		controller.saveAs=true;
+
 		//Rect Point
 		xpos = mainWindow.bounds.leftTop.x +((mainWindow.bounds.width - 200)*0.5);
 		ypos = mainWindow.bounds.leftTop.y + 200;
@@ -43,7 +46,7 @@ FileLoadAndSavePopup{
 
 		fileList = ListView.new(popupWindow, Rect(10,90,180,180));
 		fileList.items = controller.getFileList.asArray;
-		fileList.action = {arg v;filenameText.string = fileList.items[v.value]};
+		fileList.action = {arg v;filenameText.string = fileList.items[v.value];controller.saveAs=false};
 
 	}
 

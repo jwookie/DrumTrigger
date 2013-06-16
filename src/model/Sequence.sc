@@ -24,6 +24,10 @@ Sequence{
 	var <> trigOtherSeq;
 	var <> triggerSequence;
 
+	//var < triggerTask;
+	var <> triggerFlag;
+	var <> misfireTime;
+
 	var <> hitCount;
 	var random;
 	var sequenceMoveNote;
@@ -50,15 +54,17 @@ Sequence{
 		stepArray = Array.fill(numSteps,{Step.new});
 		activeSteps = Array.fill(numSteps,{1});
 
+		triggerFlag = true;
+		misfireTime = 0.25;
+		//creates a task that prevents the sequence from misfiring
+		/*triggerTask = Task({
+			1.do({
+				triggerFlag = false;
+				0.25.wait;
+				triggerFlag = true;
 
-		//globalChannel=0;
-		//globalMidiIn=0;
-		//globalOctave=0;
-
-		//random=0;
-		//trigOtherSeq=0;
-		//sequenceMoveNote = 1;
-		//stepArray.postln;
+			});
+		});*/
 
 
 	}

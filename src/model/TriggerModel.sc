@@ -17,7 +17,7 @@ TriggerModel{
 	initTriggerModel{|server|
 
 		numSteps = 16;
-		triggerChannel = 0;
+		triggerChannel = 9;
 		currentSection = 0;
 		currentStep = 0;
 		sectionList = List.new(0);

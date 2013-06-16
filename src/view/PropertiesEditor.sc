@@ -13,6 +13,7 @@ PropertiesEditor{
 	var <> midiChanGlobalButton;
 	var <> octaveBox;
 	var <> globalOctaveButton;
+	var <> misifreTimeBox;
 	var <> noteLengthBox;
 	var <> bypassSequenceButton;
 	var <> moveSequenceButton;
@@ -79,7 +80,8 @@ PropertiesEditor{
 		this.createOctaveEditor;
 		this.createNoteLengthEditor;
 		this.createBypassSequence;
-		this.createMuteSequence;
+		this.createMisfireTime;
+		//this.createMuteSequence;
 		this.createMoveSequence;
 		this.createTriggerHitsEditor;
 		this.createRandomNoteButton;
@@ -162,14 +164,23 @@ PropertiesEditor{
 						.action_{|v| controller.setUseOctaveGlobally(v.value)};
 	}
 
+	createMisfireTime{
+		//note length
+		StaticText.new(window,Rect(stepSettingsXpos+175, stepSettingsYpos+30, 80, 20))
+					.string_("Misfire time:")
+					.stringColor_(Color.black)
+					.action_{|v| };
+		misifreTimeBox = NumberBox.new(window,Rect(stepSettingsXpos+255, stepSettingsYpos+30, 50, 20))
+					.action_{|v|controller.setMisfireTime(v.value)};
+	}
 
 	createNoteLengthEditor{
 		//note length
-		noteLengthLabel = StaticText.new(window,Rect(stepSettingsXpos+160, stepSettingsYpos+30, 50, 20))
+		noteLengthLabel = StaticText.new(window,Rect(stepSettingsXpos+175, stepSettingsYpos+60, 50, 20))
 					.string_("Length:")
 					.stringColor_(Color.black)
 					.action_{|v| };
-		noteLengthBox = NumberBox.new(window,Rect(stepSettingsXpos+210, stepSettingsYpos+30, 50, 20))
+		noteLengthBox = NumberBox.new(window,Rect(stepSettingsXpos+225, stepSettingsYpos+60, 50, 20))
 					.action_{|v|controller.setNoteLength(v.value)};
 	}
 
@@ -221,12 +232,12 @@ PropertiesEditor{
 	createTriggerHitsEditor{
 
 		// number of trigger hits to move sequence
-		numTrigHitsLabel = StaticText.new(window,Rect(stepSettingsXpos+150, stepSettingsYpos+90, 100, 20))
+		numTrigHitsLabel = StaticText.new(window,Rect(stepSettingsXpos+175, stepSettingsYpos+90, 100, 20))
 		.string_("Trigger Hits:")
 		.stringColor_(Color.black)
 		.action_{|v| };
 
-		numTrigHitsBox = NumberBox.new(window,Rect(stepSettingsXpos+230, stepSettingsYpos+90, 30, 20))
+		numTrigHitsBox = NumberBox.new(window,Rect(stepSettingsXpos+255, stepSettingsYpos+90, 30, 20))
 		.action_{|v| controller.setNumTrigHits(v.value)};
 	}
 

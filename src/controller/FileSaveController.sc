@@ -2,6 +2,7 @@ FileSaveController{
 
 	var > model;
 	var controller;
+	var > saveAs;
 
 	*new{|mainController|
 		^super.new.initFileSaveController(mainController);
@@ -9,6 +10,7 @@ FileSaveController{
 
 	initFileSaveController{|mainController|
 		controller = mainController;
+		saveAs = true;
 	}
 
 	onSaveSong{|name|
@@ -45,6 +47,7 @@ FileSaveController{
 				this.addCData(xml,sequenceRoot,"sequenceIndex",sequence.sequenceIndex);
 				this.addCData(xml,sequenceRoot,"midiTriggerNote",sequence.midiTriggerNote);
 				this.addCData(xml,sequenceRoot,"midiSendChan",sequence.midiSendChan);
+				this.addCData(xml,sequenceRoot,"misfireTime",sequence.misfireTime);
 
 				//active steps
 				activeStepRoot = xml.createElement("activeSteps");
@@ -98,12 +101,13 @@ FileSaveController{
 
 		(name + "Saved").postln;
 
-		this.updateSavedSongList(name);
+		this.updateSavedSongList(name)
 	}
 
 	updateSavedSongList{|name|
-		var listFile,saveFilename,files,xml,data;
+		var listFile,saveFilename,files,xml,data,fileXml,newNode;
 
+		//"Updating saved song list..".postln;
 		saveFilename = BumTrigger.static_XML_FOLDER_PATH ++ BumTrigger.static_XML_FILE_LIST ++ ".xml";
 
 		xml = DOMDocument.new(saveFilename);
@@ -112,7 +116,25 @@ FileSaveController{
 
 		files = data.getFirstChild;
 
-		this.addCData(xml,files,"file",name);
+		fileXml = files.getFirstChild;
+		while({fileXml != nil},{
+			if(fileXml.getFirstChild.getNodeValue == name,{
+				newNode = fileXml;
+				files.removeChild(fileXml);
+				fileXml = nil;
+			},{
+				fileXml = fileXml.getNextSibling;
+			});
+		});
+
+		if(newNode == nil,{
+			newNode = this.createCData(xml,"file",name);
+			//this.addCData(xml,files,"file",name);
+		});
+
+		('NEW NODE ' + newNode).postln;
+
+		files.insertBefore(newNode,files.getFirstChild);
 
 		//now save file
 		listFile = File(saveFilename, "w");
@@ -168,13 +190,15 @@ FileSaveController{
 
 				var newSequence,stepXml,stepCtr,activeCtr;
 				newSequence = Sequence.new;
-				newSequence.sequenceName = sequenceXml.getElement("sequenceName").getFirstChild.getNodeValue.postln;
+				newSequence.sequenceName = sequenceXml.getElement("sequenceName").getFirstChild.getNodeValue;
+				("Sequence:" + newSequence.sequenceName).postln;
 				newSequence.sequenceIndex = this.getIntValue(sequenceXml,"sequenceIndex");
 				newSequence.midiTriggerNote = this.getIntValue(sequenceXml,"midiTriggerNote");
 				newSequence.midiSendChan = this.getIntValue(sequenceXml,"midiSendChan");
+				newSequence.misfireTime = this.getFloatValue(sequenceXml,"misfireTime");
 
 				//set active steps
-				"LOAD ACTIVE STEPS".postln;
+				//"LOAD ACTIVE STEPS".postln;
 				activeCtr = 0;
 				sequenceXml.getElement("activeSteps").do({arg val;
 					var stepValue;
@@ -245,14 +269,33 @@ FileSaveController{
 
 		(name + "Loaded").postln;
 
+		this.updateSavedSongList(name);
+
 	}
 
 	addCData{|xml,root,name,val|
-		root.appendChild(xml.createElement(name).appendChild(xml.createCDATASection(val)));
+		root.appendChild(this.createCData(xml,name,val));
+	}
+
+	createCData{|xml,name,val|
+		^xml.createElement(name).appendChild(xml.createCDATASection(val));
 	}
 
 	getIntValue{|xml,name|
-		^xml.getElement(name).getFirstChild.getNodeValue.asInteger;
+		if(xml.getElement(name) == nil,{
+			^0;
+			},{
+			^xml.getElement(name).getFirstChild.getNodeValue.asInteger;
+		});
+	}
+
+
+	getFloatValue{|xml,name|
+		if(xml.getElement(name) == nil,{
+			^0.0;
+			},{
+			^xml.getElement(name).getFirstChild.getNodeValue.asFloat;
+		});
 	}
 
 }

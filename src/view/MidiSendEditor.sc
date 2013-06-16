@@ -57,7 +57,7 @@ MidiSendEditor{
 		//RESET sequence
 		Button.new(window,Rect(xpos+80, ypos+30, 60, 30))
 		.states_([ [ "Reset", Color(0.0, 0.0, 0.0, 1.0), Color(1.0, 0.0, 0.0, 1.0) ]])
-		.action_{|v| controller.resetSequence };
+		.action_{|v| controller.resetAll };
 
 		//USE KEYBOARD AS MIDI CONTROLLER
 		midiKeys = Button.new(window,Rect(xpos+160, ypos+30, 80, 30))
