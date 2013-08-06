@@ -1,8 +1,13 @@
 Sequence{
 
 	classvar < static_NUM_STEPS=16;
+
+	var logger;
+
 	var controller;
 	var model;
+
+	var <> id;
 
 	var <> currentStep;
 
@@ -17,12 +22,14 @@ Sequence{
 	var <> globalChannel;
 	var <> globalMidiIn;
 	var <> sequenceName;
-	var <> sequenceIndex;
+	//var <> sequenceIndex;
 
 	var <> currentMidiData;
 
 	var <> trigOtherSeq;
 	var <> triggerSequence;
+
+	var <> tracker;
 
 	//var < triggerTask;
 	var <> triggerFlag;
@@ -39,9 +46,10 @@ Sequence{
 	}
 
 	initSequence{|name,index|
+		logger =  Logger.new("Sequence");
 		//properties
 		sequenceName = name;
-		sequenceIndex = index;
+		//sequenceIndex = index;
 		midiTriggerNote = 0;
 		midiSendChan = 0;
 

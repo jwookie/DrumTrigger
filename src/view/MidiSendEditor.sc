@@ -51,6 +51,11 @@ MidiSendEditor{
 		midiIndicator = StaticText.new(window,Rect(xpos+140, ypos, 20, 20));
 		midiIndicator.background=Color.black;
 
+		//Kill midi
+		Button.new(window,Rect(xpos, ypos+30, 60, 30))
+		.states_([ [ "Kill MIDI", Color(0.0, 0.0, 0.0, 1.0), Color(1.0, 0.0, 0.0, 1.0) ]])
+		.action_{|v| controller.killMidi };
+
 		triggerChanNumberBox = NumberBox.new(window,Rect(xpos+100, ypos, 30, 20))
 		.action_{|v| controller.onSetTriggerChannel(v.value)};
 
@@ -73,10 +78,21 @@ MidiSendEditor{
 		};
 
 
-		//Kill midi
-		Button.new(window,Rect(xpos, ypos+30, 60, 30))
-		.states_([ [ "Kill MIDI", Color(0.0, 0.0, 0.0, 1.0), Color(1.0, 0.0, 0.0, 1.0) ]])
-		.action_{|v| controller.killMidi };
+		//GO BUTTON sequence
+		//USE KEYBOARD AS MIDI CONTROLLER
+		Button.new(window,Rect(xpos+250, ypos+30, 80, 30))
+		.states_([ [ "GO", Color.black, Color.green ],
+			[ "STOP", Color.black, Color.red] ])
+		.action_{|v| if(v.value == 1,{
+			controller.setAsReady(true);
+			},{
+				controller.setAsReady(false);
+				controller.resetAll();
+				controller.killMidi();
+			});
+		};
+
+
 
 	}
 

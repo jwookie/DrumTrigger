@@ -1,9 +1,13 @@
 Section{
 
+	var logger;
+
 	var <> sequenceList;
 	var <> sequenceNames;
 	var <> sectionName;
 	var <> sectionIndex;
+
+	var <> id;
 
 	var < currentSequence;
 
@@ -13,6 +17,7 @@ Section{
 	}
 
 	initSection{|name,index|
+		logger = Logger.new("Section");
 
 		sequenceList = List.new(0);
 		sequenceNames = List.new(0);

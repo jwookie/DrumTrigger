@@ -1,5 +1,7 @@
 Step{
 
+	var logger;
+
 	var <> noteArray;
 	var <> editableProperties;
 	var <> numProperties;
@@ -18,12 +20,13 @@ Step{
 	var <> useGlobalRandom;
 	var <> triggerOtherSequence;
 	var <> triggerOtherSequenceGlobally;
-	var <> otherSequenceIndex;
+	var <> otherSequenceId;
 	var <> useOtherSequenceGlobally;
 	var <> otherActionIndex;
 	var <> setOtherActionGlobally;
 	var <> moveToSection;
 	var <> moveSectionIndex;
+	var <> otherActionValue;
 
 	var <> hitCounter;
 
@@ -33,6 +36,7 @@ Step{
 	}
 
 	initStep{
+		logger = Logger.new("Step");
 
 		//"STEP initStep".postln;
 		numMatrixKeys=24;
@@ -50,12 +54,13 @@ Step{
 		useGlobalRandom = 0;
 		triggerOtherSequence = 0;
 		triggerOtherSequenceGlobally = 0;
-		otherSequenceIndex = 0;
+		//otherSequenceId = 0;
 		useOtherSequenceGlobally = 0;
 		otherActionIndex = 0;
 		setOtherActionGlobally = 0;
 		moveToSection = 0;
 		moveSectionIndex = 0;
+		otherActionValue = 0;
 
 		hitCounter = 0;
 

@@ -3,7 +3,7 @@ Tracker{
 	//var > model;
 	var window;
 	var controller;
-	var title;
+	var < title;
 
 	var startX;
 	var startY;

@@ -1,5 +1,7 @@
 FileSaveController{
 
+	var logger;
+
 	var > model;
 	var controller;
 	var > saveAs;
@@ -9,12 +11,16 @@ FileSaveController{
 	}
 
 	initFileSaveController{|mainController|
+		logger = Logger.new("FileSaveController");
 		controller = mainController;
 		saveAs = true;
 	}
 
 	onSaveSong{|name|
-		var file, filename, xml, dataRoot, sections;
+		var file, filename, xml, dataRoot, sections,seed;
+		if(name == "",{
+			^false;
+		});
 		("Saving" + name ++ "...").postln;
 		filename = BumTrigger.static_XML_FOLDER_PATH ++ name ++ ".xml";
 		filename.postln;
@@ -22,6 +28,10 @@ FileSaveController{
 		xml = DOMDocument.new;
 		dataRoot = xml.createElement("data");
 		xml.appendChild(dataRoot);
+
+		seed = xml.createElement("seed");
+		xml.appendChild(seed);
+		this.addCData(xml,seed,"value",model.seedNumber);
 
 		sections = model.sectionList;
 
@@ -81,6 +91,7 @@ FileSaveController{
 					this.addCData(xml,stepRoot,"setOtherActionGlobally",step.setOtherActionGlobally);
 					this.addCData(xml,stepRoot,"moveToSection",step.moveToSection);
 					this.addCData(xml,stepRoot,"moveSectionIndex",step.moveSectionIndex);
+					this.addCData(xml,stepRoot,"otherActionValue",step.otherActionValue);
 
 					//now create note settings
 					notesRoot = xml.createElement("notes");
@@ -164,13 +175,20 @@ FileSaveController{
 	}
 
 	onLoadSong{|name|
-		var filename,xml,data,sectionXml, sectionList,sectionNames,test;
+		var filename,xml,data,sectionXml, sectionList,sectionNames,test,seed;
 		("Loading" + name ++ "...").postln;
 
 		//retrieve file and create xml
 		filename = BumTrigger.static_XML_FOLDER_PATH ++ name ++ ".xml";
 		xml = DOMDocument.new(filename);
 		data = xml.getDocumentElement.getElement("data");
+
+		seed = data.getNextSibling;
+		if(seed != nil,{
+			model.setSeedNumber(this.getIntValue(seed,"value"));
+		});
+		["SEED",seed,"VAL",model.seedNumber].postln;
+
 
 		//init new section list and names
 		sectionList = List.new(0);
@@ -233,6 +251,7 @@ FileSaveController{
 					step.setOtherActionGlobally = this.getIntValue(stepXml,"setOtherActionGlobally");
 					step.moveToSection = this.getIntValue(stepXml,"moveToSection");
 					step.moveSectionIndex = this.getIntValue(stepXml,"moveSectionIndex");
+					step.otherActionValue = this.getFloatValue(stepXml,"otherActionValue");
 
 					//"LOAD NOTES".postln;
 					noteCtr = 0;

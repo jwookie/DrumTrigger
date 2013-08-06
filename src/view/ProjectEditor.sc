@@ -87,6 +87,10 @@ ProjectEditor{
 		Button.new(window,Rect(xpos, ypos, 60, 20))
 		.states_([ [ "Rename", Color(0.0, 0.0, 0.0, 1.0), Color(1.0, 0.0, 0.0, 1.0) ]])
 		.action_{|v| controller.renameSection(sectionNameText.value);sectionNameText.string = ""};
+		//remove section button
+		Button.new(window,Rect(xpos+325, ypos, 60, 20))
+		.states_([ [ "Remove", Color(0.0, 0.0, 0.0, 1.0), Color(1.0, 0.0, 0.0, 1.0) ]])
+		.action_{|v| controller.removeSection()};
 
 	}
 
@@ -116,6 +120,10 @@ ProjectEditor{
 		Button.new(window,Rect(xpos, ypos+60, 60, 20))
 		.states_([ [ "Rename", Color(0.0, 0.0, 0.0, 1.0), Color(1.0, 0.0, 0.0, 1.0) ]])
 		.action_{|v| controller.renameSequence(sequenceNameText.value); sequenceNameText.string = ""};
+		//REMOVE SEQUENCE
+		Button.new(window,Rect(xpos+325, ypos+60, 60, 20))
+		.states_([ [ "Remove", Color(0.0, 0.0, 0.0, 1.0), Color(1.0, 0.0, 0.0, 1.0) ]])
+		.action_{|v| controller.removeSequence()};
 
 	}
 

@@ -1,5 +1,7 @@
 PropertiesEditor{
 
+	var logger;
+
 	var window;
 	var controller;
 
@@ -28,6 +30,7 @@ PropertiesEditor{
 	var <> setOtherActionGlobalButton;
 	var <> moveToSectionButton;
 	var <> moveToSectionCombo;
+	var <> otherActionValueBox;
 
 	var muteSequenceButton;//just for debug at the moment
 
@@ -49,6 +52,7 @@ PropertiesEditor{
 	}
 
 	initPropertiesEditor{|initWindow,initController|
+		logger = Logger.new("PropertiesEditor");
 
 		window = initWindow;
 		controller = initController;
@@ -310,6 +314,10 @@ PropertiesEditor{
 				.states_([ [ "", Color(0.0, 0.0, 0.0, 1.0), Color(1.0, 0.0, 0.0, 1.0) ],
 							[ "", Color(1.0, 1.0, 1.0, 1.0), Color(0.0, 0.0, 1.0, 1.0) ] ])
 		.action_{|v| controller.setUseOtherActionGlobally(v.value)};
+
+	otherActionValueBox = NumberBox.new(window,Rect(stepSettingsXpos+260, stepSettingsYpos+200, 30, 20))
+		.action_{|v| controller.setOtherActionValue(v.value)};
+	otherActionValueBox.visible=false;
 	}
 
 	createMoveToNextSectionEditors{

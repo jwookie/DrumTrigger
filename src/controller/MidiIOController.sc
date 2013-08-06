@@ -1,11 +1,14 @@
 MidiIOController{
 
+	var logger;
+
 	var > model;
 	var controller;
 
 	var midiOut;
 
 	var middleCVal;
+	var list_RampTasks;
 
 	*new{|mainController|
 		^super.new.initMidiController(mainController);
@@ -14,22 +17,29 @@ MidiIOController{
 
 	initMidiController{|mainController|
 
+		logger = Logger.new("MidiIOController");
 		controller = mainController;
 		middleCVal = 36;
+		list_RampTasks = List.new();
 		this.initMidi;
+
+	}
+
+	setAsReady{|ready|
+
+		model.ready = ready;
 
 	}
 
 	initMidi{
 		var inPorts = 2;
 		var outPorts = 1;
-		"Initialising MIDI..".postln;
+		logger.debug("Initialising MIDI..");
 
 		MIDIClient.init(inPorts,outPorts);
 		// explicitly intialize the client
 		inPorts.do({ arg i;
-			i.postln;
-			MIDIIn.connect(i, MIDIClient.sources.at(i).postln);
+			MIDIIn.connect(i, MIDIClient.sources.at(i));
 		});
 
 		midiOut = MIDIOut(0);
@@ -40,9 +50,23 @@ MidiIOController{
 	}
 
 	resetAll{
-		model.getCurrentSection.sequenceList.do{arg val;
-			val.currentStep = 0;
-		}
+		//reset model
+		model.sectionList.do{arg section;
+			section.sequenceList.do{arg sequence;
+				sequence.currentStep = 0;
+			};
+		};
+		//reset any cc controllers..
+		16.do{arg i;
+			midiOut.control(i,7,127);
+		};
+		//set back to first section
+		controller.changeSection(0);
+
+		list_RampTasks.do{arg val;val.stop()};
+
+
+
 	}
 
 	onSetTriggerChannel{|chan|
@@ -60,29 +84,21 @@ MidiIOController{
 
 		if(sequence.currentMidiData!=nil,{this.stopMIDI(sequence.currentMidiData)});
 
-		step.noteArray.postln;
-
 		step.noteArray.do{arg val,i;
 			if(val == 1,{
 				var midiNum = i + (step.octave*12) + middleCVal;
-				["NOTE ON",sendChan,midiNum].postln;
+				logger.debug(["NOTE ON",sendChan,midiNum]);
 				midiOut.noteOn(sendChan,midiNum,velocity);
 				notesPlayed.add(midiNum);
 			});
 		};
 		sequence.currentMidiData = [sendChan,notesPlayed.asArray];
 
-		//controller.postln;
 		controller.setNoteIndicator(sequence);
 	}
 
 	skipStep{|sequence|
-		/*var step = sequence.stepArray[sequence.currentStep];
-		//[sequence.hitCount , step.numTrigHits].postln;
-		if(sequence.hitCount < step.numTrigHits,{
-			sequence.hitCount = sequence.hitCount+1;
-		},{*/
-			sequence.hitCount = 0;
+		sequence.hitCount = 0;
 			if(sequence.stepArray[sequence.currentStep].randomNote == 0,{
 
 				//first increment step
@@ -93,7 +109,6 @@ MidiIOController{
 				});
 
 				//then increment until step is active
-				//["STEP ACTIVE ?",sequence.activeSteps[sequence.currentStep]].postln;
 				while{sequence.activeSteps[sequence.currentStep]==0}{
 					//["SEQ STEP ",sequence.currentStep].postln;
 					if(sequence.currentStep+1 < Sequence.static_NUM_STEPS,{
@@ -108,14 +123,9 @@ MidiIOController{
 					sequence.currentStep = Sequence.static_NUM_STEPS.rand;
 					while{sequence.activeSteps[sequence.currentStep]==0}{sequence.currentStep = Sequence.static_NUM_STEPS.rand};
 			});
-
-		//});
-
-		//currentStep.postln;
 	}
 
 	stopMIDI{|midiData|
-		//midiData.postln;
 		if(midiData != nil,{
 			midiData[1].do{arg val;
 				midiOut.noteOff(midiData[0],val);
@@ -125,7 +135,6 @@ MidiIOController{
 
 	startMisfireTask{|sequence|
 		var triggerTask;
-		["STSRT MISIFIRE TASK ",sequence.sequenceName,sequence.misfireTime].postln;
 		//creates a task that prevents the sequence from misfiring
 		triggerTask = Task({
 			1.do({
@@ -139,15 +148,12 @@ MidiIOController{
 	}
 
 	onMidiIn{|src,chan,num|
-		//[src,chan,num].postln;
-		//model.triggerChannel;
 		if(chan == model.triggerChannel, {
-			["ON MIDI IN",chan,num,"SECTION",model.currentSection].postln;
+			logger.debug(["ON MIDI IN",model.ready,chan,num]);
+			if(model.ready == false,{^false;});
 			model.getCurrentSection.sequenceList.do{arg val;
 				var actionArray;// = [0];//sequence.onMidiIn;
-				//var index = sequence.sequenceIndex;
 				var step;
-				//[num,val.midiTriggerNote].postln;
 				if(num == val.midiTriggerNote,{
 					if(val.triggerFlag == true,{
 						//start trigger task to stop misifiring
@@ -160,7 +166,6 @@ MidiIOController{
 								actionArray = [3];
 								},{
 									if(step.moveSequence == 1,{
-										//[step.hitCounter , step.numTrigHits].postln;
 										if(step.numTrigHits > (step.hitCounter + 1),{
 											actionArray = [2];
 											step.hitCounter = step.hitCounter + 1;
@@ -178,18 +183,18 @@ MidiIOController{
 
 						this.performTriggerAction(val,actionArray);
 						if(step.triggerOtherSequence == 1,{
-							["-------- ABOUT TO PREFORM OTHER TRIGGER",step.otherActionIndex].postln;
-							this.performOtherTriggerAction(step.otherSequenceIndex,step.otherActionIndex);
+							this.performOtherTriggerAction(step);
 						});
 
 						if(step.moveToSection == 1,{
-							["MOVING TO SECTION - "].postln;
-							[model.sectionList[step.moveSectionIndex].sectionName].postln;
-							model.currentSection = step.moveSectionIndex;
+							logger.debug(["MOVING TO SECTION - "]);
+							logger.debug([model.sectionList[step.moveSectionIndex].sectionName]);
+							controller.changeSection(step.moveSectionIndex);
+							//model.currentSection = step.moveSectionIndex;
 						});
 					},{
 						//trigger misfiring
-						["--- MISFIRE ---",val.sequenceName].postln;
+						logger.debug(["--- MISFIRE ---",val.sequenceName]);
 					});
 				});
 			}
@@ -202,7 +207,7 @@ MidiIOController{
 		//var actionArray = [0];//sequence.onMidiIn;
 		var index = sequence.sequenceIndex;
 		var step = sequence.stepArray[sequence.currentStep];
-		["PERFORM TRIGGER ACTION",sequence.sequenceName,actionArray].postln;
+		logger.debug(["PERFORM TRIGGER ACTION",sequence.sequenceName,actionArray]);
 
 		actionArray.do{arg val;
 			actionNum = val;//actionArray[0];
@@ -239,11 +244,61 @@ MidiIOController{
 		};
 	}
 
-	performOtherTriggerAction{|seqIndex,action|
-		var sequence;// = model.getCurrentSection.sequenceList[seqIndex];
-		["PERFORM OTHER TRIGGER !",seqIndex,action].postln;
-		sequence = model.getCurrentSection.sequenceList[seqIndex];
-		//sequence.postln;
+	performOtherTriggerAction{|step|
+		//seqIndex,action
+		var seqIndex = step.otherSequenceIndex;
+		var action = step.otherActionIndex;
+		//var sequence = model.getCurrentSection.sequenceList[seqIndex];
+		var sequence = model.getSequence(step.otherSequenceId);
+		logger.debug(["PERFORM OTHER TRIGGER ON",sequence.sequenceName,seqIndex,action]);
+
+		switch(action,
+			0,{},
+			1,{
+			//SKIP STEP
+				this.skipStep(sequence);},
+			2,{
+				//TOGGLE SKIP
+				if(sequence.stepArray[sequence.currentStep].moveSequence == 1,{
+					sequence.stepArray[sequence.currentStep].moveSequence = 0
+					},{
+						sequence.stepArray[sequence.currentStep].moveSequence = 1
+			    })},
+			3,{
+				logger.debug("RESET");
+				sequence.currentStep = 0;},
+			4,{
+				logger.debug("TOGGLE CHANGE SECTION");
+				//currentStep = 0;
+				sequence.stepArray[sequence.currentStep].moveToSection = 1;},
+			5,{
+				logger.debug("TOGGLE BYPASS SECTION");
+				if(sequence.stepArray[sequence.currentStep].bypassSequence == 1,{
+					sequence.stepArray[sequence.currentStep].bypassSequence = 0;
+					},{
+						sequence.stepArray[sequence.currentStep].bypassSequence = 1;
+			    })},
+			6,{
+				logger.debug(["MUTE SEQUENCE"]);
+				this.stopMIDI(sequence.currentMidiData);},
+			7,{
+				logger.debug(["MUTE CHANNEL"]);
+				//TODO..
+			   },
+			8,{
+				logger.debug(["FADE OUT"]);
+				this.startRampTask("out",sequence,step.otherActionValue);},
+			9,{
+				logger.debug(["FADE IN"]);
+				this.startRampTask("IN",sequence,step.otherActionValue);},
+			10,{
+				logger.debug(["GOTO STEP"]);
+				sequence.currentStep = (step.otherActionValue - 1).floor;}
+		)
+
+
+
+		/*
 		if(action == 0,{
 			//DO NOTHING
 		},{if(action == 1,{
@@ -275,12 +330,52 @@ MidiIOController{
 			})
 
 		},{if(action == 6,{
-			["MUTE SEQUENCE, SKIP STEP"].postln;
+			["MUTE SEQUENCE"].postln;
 			this.stopMIDI(sequence.currentMidiData);
 			//this.skipStep(sequence);
 
+		},{if(action == 7,{
+			["MUTE CHANNEL"].postln;
+			//TODO..
 
-		}) })	})	})	})	})	})
+		},{if(action == 8,{
+			["FADE OUT"].postln;
+			this.startRampTask("out",sequence,step.otherActionValue);
+
+		},{if(action == 9,{
+			["FADE IN"].postln;
+			this.startRampTask("IN",sequence,step.otherActionValue);
+
+		},{if(action == 10,{
+			["GOTO STEP"].postln;
+			sequence.currentStep = (step.otherActionValue - 1).floor;
+
+		}) })	})	})	})	})	}) }) }) }) })
+		*/
+	}
+
+	startRampTask{|direction,sequence,length|
+		var rampTask;
+		var len = (length*50).floor;
+		logger.debug(["START FADE OUT",len]);
+		rampTask = Task({
+			len.do({arg i;
+				var val;
+				logger.debug([i,sequence.midiSendChan-1,7,(127 * ((len-i)/len)).ceil]);
+				if(direction == "out",{
+					val = (127 * ((len-i)/len)).ceil;
+					},{
+						val = 127 - (127 * ((len-i)/len)).ceil;
+				});
+				midiOut.control(sequence.midiSendChan-1,7,val);
+				0.02.wait;
+
+			});
+			logger.debug(["RAMP OUT DONE"]);
+			list_RampTasks.remove(rampTask);
+		});
+		rampTask.start;
+		list_RampTasks.add(rampTask);
 	}
 
 	onKeyDown{|keyVal|
@@ -297,21 +392,20 @@ MidiIOController{
 				i=i+1
 			});
 		});
-
-		"ON KEY DOWN".postln;
-		//[keyVal,note].postln;
+		logger.debug("- - - -");
 		//if it is, convert to midi num
 		if(note != nil,{
-			note = note + 36;
-			this.onMidiIn(0,model.triggerChannel,note);
+			logger.debug(["ON KEY DOWN",note + 36]);
+			//note = note + 36;
+			this.onMidiIn(0,model.triggerChannel,note+36);
 		});
 	}
 
 	killMidi{
-		"KILL MIDI".postln;
+		logger.debug("KILL MIDI");
 		16.do{arg i;
 
-			80.do{arg j;
+			127.do{arg j;
 				midiOut.noteOff(i,j);
 
 			}

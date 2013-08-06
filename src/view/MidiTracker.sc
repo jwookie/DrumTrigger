@@ -1,6 +1,7 @@
 MidiTracker{
 
-	//var > model;
+	var logger;
+
 	var window;
 	var controller;
 
@@ -19,6 +20,7 @@ MidiTracker{
 
 	initMidiTracker{|initWindow,initController|
 
+		logger = Logger.new("MidiTracker");
 		window = initWindow;
 		controller = initController;
 
@@ -46,6 +48,7 @@ MidiTracker{
 					newTracker.setStepTracker(val.currentStep);
 					trackers.add(newTracker);
 			});
+			val.tracker = newTracker;
 
 		};
 
@@ -58,7 +61,14 @@ MidiTracker{
 	}
 
 	updateTracker{|sequence|
-		trackers[sequence.sequenceIndex].setStepTracker(sequence.currentStep);
+		logger.debug(["UPDATE TRACKER",sequence.sequenceIndex,trackers,trackers.size]);
+		/*trackers.do{arg val;
+			if(val.title.string == sequence.sequenceName,{
+				tracker = val;
+			});
+		};*/
+		sequence.tracker.setStepTracker(sequence.currentStep);
+		//trackers[sequence.sequenceIndex].setStepTracker(sequence.currentStep);
 	}
 
 }

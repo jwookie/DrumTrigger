@@ -1,5 +1,7 @@
 TriggerGUI{
 
+	var logger;
+
 	var > controller;
 	var window;
 
@@ -33,9 +35,11 @@ TriggerGUI{
 
 	initTriggerGUI{|initController|
 
+		logger = Logger.new("TriggerGUI");
 		controller = initController;
 
-		window = Window.new("Drum Trigger",Rect(300, 100, 700, 550)).front;
+		//create the main window
+		window = Window.new("Drum Trigger",Rect(300, 100, 750, 550)).front;
 		window.onClose_{controller.onMainWindowClosed};
 		window.alwaysOnTop = true;
 
