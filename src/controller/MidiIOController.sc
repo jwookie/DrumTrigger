@@ -204,8 +204,6 @@ MidiIOController{
 
 	performTriggerAction{|sequence,actionArray|
 		var actionNum;
-		//var actionArray = [0];//sequence.onMidiIn;
-		var index = sequence.sequenceIndex;
 		var step = sequence.stepArray[sequence.currentStep];
 		logger.debug(["PERFORM TRIGGER ACTION",sequence.sequenceName,actionArray]);
 
@@ -246,11 +244,10 @@ MidiIOController{
 
 	performOtherTriggerAction{|step|
 		//seqIndex,action
-		var seqIndex = step.otherSequenceIndex;
 		var action = step.otherActionIndex;
 		//var sequence = model.getCurrentSection.sequenceList[seqIndex];
 		var sequence = model.getSequence(step.otherSequenceId);
-		logger.debug(["PERFORM OTHER TRIGGER ON",sequence.sequenceName,seqIndex,action]);
+		logger.debug(["PERFORM OTHER TRIGGER ON",sequence.sequenceName,action]);
 
 		switch(action,
 			0,{},
@@ -402,7 +399,7 @@ MidiIOController{
 	}
 
 	killMidi{
-		logger.debug("KILL MIDI");
+		//logger.debug("KILL MIDI");
 		16.do{arg i;
 
 			127.do{arg j;
@@ -411,15 +408,5 @@ MidiIOController{
 			}
 		}
 	}
-
-	/*toggleMidiInidcator{|on,chan|
-		var col;
-
-		if(chan == model.triggerChannel, {
-			if(on == true,{col = Color.red},{col = Color.white});
-			{midiIndicator.background = col}.defer;
-		})
-
-	}*/
 
 }

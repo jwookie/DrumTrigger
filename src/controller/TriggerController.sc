@@ -79,7 +79,7 @@ TriggerController{
 	}
 
 	setNoteIndicator{|sequence|
-		//"SET NOTE INDICATOR".postln;
+		logger.debug("SET NOTE INDICATOR");
 		gui.midiTracker.updateTracker(sequence);
 	}
 
@@ -391,7 +391,7 @@ TriggerController{
 		logger.debug("renameSequence "+sequenceName);
 		model.getCurrentSequence.sequenceName = sequenceName;
 		model.getCurrentSection.sequenceNames.put(seqIndex,sequenceName);
-		//model.getCurrentSection.sequenceNames.put(model.getCurrentSequence.sequenceIndex,sequenceName);
+
 		this.updateSequenceCombos;
 		this.updateMidiTrackers;
 		this.updateSequenceTitle;
@@ -412,11 +412,11 @@ TriggerController{
 		this.applyNoteSettings;
 		this.setActiveSteps;
 		this.switchSteps(0);
-		//this.setNoteIndicator;
 
 	}
 
 	updateMidiTrackers{
+	logger.debug("updateMidiTrackers");
 		gui.midiTracker.addTrackers(model.getCurrentSection);
 	}
 
@@ -496,7 +496,7 @@ TriggerController{
 	getIndexFromListAndId{|list,id|
 	    var i = 0;
 		var index;
-	logger.debug(["getIndexFromListAndId",list,list.size,id]);
+	//logger.debug(["getIndexFromListAndId",list,list.size,id]);
 		while{(index == nil) && (i < list.size)}
 		{
 			if(list[i].id == id,{

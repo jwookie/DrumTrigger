@@ -38,18 +38,18 @@ MidiTracker{
 
 	addTrackers{|section|
 		var removeTracker;
+		//logger.debug("addTrackers "+section.sequenceList.size+' : '+trackers.size);
 		section.sequenceList.do{arg val, i;
 			var newTracker;
 			if(i < trackers.size,{
 				trackers[i].setTitle(val.sequenceName);
-				trackers[i].setStepTracker(val.currentStep);
+				newTracker = trackers[i];
 				},{
 					newTracker = Tracker.new(scrollView,val,5,5 + (i*40));
-					newTracker.setStepTracker(val.currentStep);
 					trackers.add(newTracker);
 			});
+			newTracker.setStepTracker(val.currentStep);
 			val.tracker = newTracker;
-
 		};
 
 		while{trackers.size != section.sequenceList.size}{
@@ -61,14 +61,8 @@ MidiTracker{
 	}
 
 	updateTracker{|sequence|
-		logger.debug(["UPDATE TRACKER",sequence.sequenceIndex,trackers,trackers.size]);
-		/*trackers.do{arg val;
-			if(val.title.string == sequence.sequenceName,{
-				tracker = val;
-			});
-		};*/
+		//logger.debug(["UPDATE TRACKER",sequence.sequenceName,sequence.tracker,trackers,trackers.size]);
 		sequence.tracker.setStepTracker(sequence.currentStep);
-		//trackers[sequence.sequenceIndex].setStepTracker(sequence.currentStep);
 	}
 
 }

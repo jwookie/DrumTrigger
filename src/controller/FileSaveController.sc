@@ -21,7 +21,7 @@ FileSaveController{
 		if(name == "",{
 			^false;
 		});
-		("Saving" + name ++ "...").postln;
+		logger.debug("Saving" + name ++ "...");
 		filename = BumTrigger.static_XML_FOLDER_PATH ++ name ++ ".xml";
 		filename.postln;
 
@@ -34,7 +34,7 @@ FileSaveController{
 		this.addCData(xml,seed,"value",model.seedNumber);
 
 		sections = model.sectionList;
-
+		logger.debug(model.sectionList);
 		sections.do({arg section;
 			var sectionRoot,sequencesRoot;
 			sectionRoot = xml.createElement("section");
@@ -54,7 +54,7 @@ FileSaveController{
 
 				//add sequence properties
 				this.addCData(xml,sequenceRoot,"sequenceName",sequence.sequenceName);
-				this.addCData(xml,sequenceRoot,"sequenceIndex",sequence.sequenceIndex);
+				this.addCData(xml,sequenceRoot,"id",sequence.id);
 				this.addCData(xml,sequenceRoot,"midiTriggerNote",sequence.midiTriggerNote);
 				this.addCData(xml,sequenceRoot,"midiSendChan",sequence.midiSendChan);
 				this.addCData(xml,sequenceRoot,"misfireTime",sequence.misfireTime);
@@ -85,7 +85,7 @@ FileSaveController{
 					this.addCData(xml,stepRoot,"useGlobalRandom",step.useGlobalRandom);
 					this.addCData(xml,stepRoot,"triggerOtherSequence",step.triggerOtherSequence);
 					this.addCData(xml,stepRoot,"triggerOtherSequenceGlobally",step.triggerOtherSequenceGlobally);
-					this.addCData(xml,stepRoot,"otherSequenceIndex",step.otherSequenceIndex);
+					this.addCData(xml,stepRoot,"otherSequenceId",step.otherSequenceId);
 					this.addCData(xml,stepRoot,"useOtherSequenceGlobally",step.useOtherSequenceGlobally);
 					this.addCData(xml,stepRoot,"otherActionIndex",step.otherActionIndex);
 					this.addCData(xml,stepRoot,"setOtherActionGlobally",step.setOtherActionGlobally);
@@ -103,10 +103,13 @@ FileSaveController{
 			});
 		});
 
+		logger.debug("create file");
 		//now save file
 		file = File(filename, "w");
+		logger.debug("write file "+xml);
 		xml.write(file); // output to file with default formatting
 		file.close;
+		logger.debug("DONE");
 
 		controller.setSongTitle(name);
 
@@ -187,7 +190,7 @@ FileSaveController{
 		if(seed != nil,{
 			model.setSeedNumber(this.getIntValue(seed,"value"));
 		});
-		["SEED",seed,"VAL",model.seedNumber].postln;
+		logger.debug(["SEED",seed,"VAL",model.seedNumber]);
 
 
 		//init new section list and names
@@ -209,8 +212,9 @@ FileSaveController{
 				var newSequence,stepXml,stepCtr,activeCtr;
 				newSequence = Sequence.new;
 				newSequence.sequenceName = sequenceXml.getElement("sequenceName").getFirstChild.getNodeValue;
-				("Sequence:" + newSequence.sequenceName).postln;
-				newSequence.sequenceIndex = this.getIntValue(sequenceXml,"sequenceIndex");
+				logger.debug("Sequence:" + newSequence.sequenceName);
+				//newSequence.sequenceIndex = this.getIntValue(sequenceXml,"sequenceIndex");
+				newSequence.id = this.getIntValue(sequenceXml,"id");
 				newSequence.midiTriggerNote = this.getIntValue(sequenceXml,"midiTriggerNote");
 				newSequence.midiSendChan = this.getIntValue(sequenceXml,"midiSendChan");
 				newSequence.misfireTime = this.getFloatValue(sequenceXml,"misfireTime");
@@ -245,7 +249,8 @@ FileSaveController{
 					step.useGlobalRandom = this.getIntValue(stepXml,"useGlobalRandom");
 					step.triggerOtherSequence = this.getIntValue(stepXml,"triggerOtherSequence");
 					step.triggerOtherSequenceGlobally = this.getIntValue(stepXml,"triggerOtherSequenceGlobally");
-					step.otherSequenceIndex = this.getIntValue(stepXml,"otherSequenceIndex");
+					step.otherSequenceId = this.getIntValue(stepXml,"otherSequenceId");
+
 					step.setOtherActionGlobally = this.getIntValue(stepXml,"setOtherActionGlobally");
 					step.otherActionIndex = this.getIntValue(stepXml,"otherActionIndex");
 					step.setOtherActionGlobally = this.getIntValue(stepXml,"setOtherActionGlobally");
@@ -297,13 +302,17 @@ FileSaveController{
 	}
 
 	createCData{|xml,name,val|
+		if(val == nil,{val = "NIL_VALUE"});
 		^xml.createElement(name).appendChild(xml.createCDATASection(val));
 	}
 
 	getIntValue{|xml,name|
+
 		if(xml.getElement(name) == nil,{
+			//logger.debug(name + "is NIL ! ");
 			^0;
 			},{
+			//logger.debug(name + "is : "+xml.getElement(name).getFirstChild.getNodeValue);
 			^xml.getElement(name).getFirstChild.getNodeValue.asInteger;
 		});
 	}
