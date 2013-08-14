@@ -5,8 +5,7 @@ Section{
 	var <> sequenceList;
 	var <> sequenceNames;
 	var <> sectionName;
-	var <> sectionIndex;
-
+	
 	var <> id;
 
 	var < currentSequence;
@@ -23,8 +22,7 @@ Section{
 		sequenceNames = List.new(0);
 
 		sectionName = name;
-		sectionIndex = index;
-
+		
 		currentSequence = 0;
 	}
 

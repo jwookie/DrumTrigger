@@ -310,13 +310,14 @@ TriggerController{
 	}
 
 	setMoveSection{|sectionIndex|
-		model.getCurrentStep.moveSectionIndex = sectionIndex;
+
+		model.getCurrentStep.moveSectionId = model.sectionList[sectionIndex].id;
 	}
 
 	addNewSection{|sectionName|
 
 		var newIndex = model.sectionList.size;
-		var newSection = Section.new(sectionName,newIndex);
+		var newSection = Section.new(sectionName);
 		logger.debug("addNewSection " + sectionName);
 		newSection.id = model.getSeedNumber;
 		model.sectionList.add(newSection);
@@ -334,7 +335,7 @@ TriggerController{
 
 		model.getCurrentSection.sectionName = sectionName;
 		gui.projectEditor.sectionTitle.string = sectionName;
-		model.sectionNames.put(model.getCurrentSection.sectionIndex,sectionName);
+		model.sectionNames.put(model.currentSection,sectionName);
 		this.updateSectionCombos;
 	}
 
@@ -387,14 +388,15 @@ TriggerController{
 	}
 
 	renameSequence{|sequenceName|
-		var seqIndex = this.getIndexFromListAndId(model.getCurrentSection.sequenceList,model.getCurrentSequence.id);
-		logger.debug("renameSequence "+sequenceName);
+		var seqIndex = model.getSequenceIndex(model.getCurrentSequence.id);
+		logger.debug("renameSequence "+sequenceName + ' '+seqIndex);
 		model.getCurrentSequence.sequenceName = sequenceName;
 		model.getCurrentSection.sequenceNames.put(seqIndex,sequenceName);
 
 		this.updateSequenceCombos;
 		this.updateMidiTrackers;
 		this.updateSequenceTitle;
+		gui.projectEditor.sequenceCombo.value = seqIndex;
 	}
 
 	removeSequence{
@@ -473,7 +475,7 @@ TriggerController{
 
 		gui.propertiesEditor.setOtherActionGlobalButton.value = model.getCurrentStep.setOtherActionGlobally;
 		gui.propertiesEditor.moveToSectionButton.value = model.getCurrentStep.moveToSection;
-		gui.propertiesEditor.moveToSectionCombo.value = model.getCurrentStep.moveSectionIndex;
+		
 		gui.propertiesEditor.otherActionValueBox.value = model.getCurrentStep.otherActionValue;
 		if(model.getCurrentStep.otherActionIndex >= 7,{
 			gui.propertiesEditor.otherActionValueBox.visible = true;
@@ -481,31 +483,14 @@ TriggerController{
 				gui.propertiesEditor.otherActionValueBox.visible = false;
 		});
 
+		//get index of section to switch to
+		gui.propertiesEditor.moveToSectionCombo.value = model.getSectionIndex(model.getCurrentStep.moveSectionId);
+		//gui.propertiesEditor.moveToSectionCombo.value = model.getCurrentStep.moveSectionIndex;
+
 		// get index of other sequence
 		logger.debug("get index of other sequence");
-		gui.propertiesEditor.otherSequenceCombo.value = this.getIndexFromListAndId(model.getCurrentSection.sequenceList,model.getCurrentStep.otherSequenceId);
-
-		/*;nil;this.getIndexFromListAndId(gui.propertiesEditor.otherSequenceCombo.items,model.getCurrentStep.otherSequenceId);
-		while{gui.propertiesEditor.otherSequenceCombo.value == nil}
-		{
-			model.getCurrentStep.otherSequenceId;
-		}*/
-
+		gui.propertiesEditor.otherSequenceCombo.value = model.getSequenceIndex(model.getCurrentStep.otherSequenceId);
 	}
 
-	getIndexFromListAndId{|list,id|
-	    var i = 0;
-		var index;
-	//logger.debug(["getIndexFromListAndId",list,list.size,id]);
-		while{(index == nil) && (i < list.size)}
-		{
-			if(list[i].id == id,{
-				index = i;
-			});
-			i = i+1;
-		}
-		^index;
-
-	}
 
 }

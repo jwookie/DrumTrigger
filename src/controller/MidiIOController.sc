@@ -188,9 +188,7 @@ MidiIOController{
 
 						if(step.moveToSection == 1,{
 							logger.debug(["MOVING TO SECTION - "]);
-							logger.debug([model.sectionList[step.moveSectionIndex].sectionName]);
-							controller.changeSection(step.moveSectionIndex);
-							//model.currentSection = step.moveSectionIndex;
+							controller.changeSection(model.getSectionIndex(step.moveSectionId));
 						});
 					},{
 						//trigger misfiring
@@ -233,7 +231,7 @@ MidiIOController{
 			},{if(actionNum == 3,{
 				//SEND MIDI, CHANGE SECTION
 				this.sendMidi(sequence);
-				controller.changeSection(step.moveSectionIndex);
+				controller.changeSection(model.getSectionIndex(step.moveSectionId));
 			},{if(actionNum == 4,{
 				//MUTE SEQUENCE
 				this.stopMIDI(sequence.currentMidiData);

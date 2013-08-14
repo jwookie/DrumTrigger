@@ -71,6 +71,14 @@ TriggerModel{
 
 	}
 
+	getSequenceIndex{|id|
+		^this.getIndexFromListAndId(this.getCurrentSection.sequenceList,id);
+	}
+
+	getSectionIndex{|id|
+		^this.getIndexFromListAndId(sectionList,id);
+	}
+
 	getCurrentSection{
 
 		^sectionList[currentSection];
@@ -86,6 +94,21 @@ TriggerModel{
 	getCurrentStep{
 
 		^this.getCurrentSequence.stepArray[currentStep];
+
+	}
+
+	getIndexFromListAndId{|list,id|
+	    var i = 0;
+		var index;
+	//logger.debug(["getIndexFromListAndId",list,list.size,id]);
+		while{(index == nil) && (i < list.size)}
+		{
+			if(list[i].id == id,{
+				index = i;
+			});
+			i = i+1;
+		}
+		^index;
 
 	}
 

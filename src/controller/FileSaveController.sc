@@ -42,7 +42,7 @@ FileSaveController{
 
 			//section properties
 			this.addCData(xml,sectionRoot,"sectionName",section.sectionName);
-			this.addCData(xml,sectionRoot,"sectionIndex",section.sectionIndex);
+			//this.addCData(xml,sectionRoot,"sectionIndex",section.sectionIndex);
 
 			//sequences in section
 			sequencesRoot = xml.createElement("sequences");
@@ -90,7 +90,7 @@ FileSaveController{
 					this.addCData(xml,stepRoot,"otherActionIndex",step.otherActionIndex);
 					this.addCData(xml,stepRoot,"setOtherActionGlobally",step.setOtherActionGlobally);
 					this.addCData(xml,stepRoot,"moveToSection",step.moveToSection);
-					this.addCData(xml,stepRoot,"moveSectionIndex",step.moveSectionIndex);
+					this.addCData(xml,stepRoot,"moveSectionId",step.moveSectionId);
 					this.addCData(xml,stepRoot,"otherActionValue",step.otherActionValue);
 
 					//now create note settings
@@ -204,7 +204,7 @@ FileSaveController{
 			var newSection,sequenceXml;
 			newSection = Section.new;
 			newSection.sectionName = sectionXml.getElement("sectionName").getFirstChild.getNodeValue.postln;
-			newSection.sectionIndex = this.getIntValue(sectionXml,"sectionIndex");
+			//newSection.sectionIndex = this.getIntValue(sectionXml,"sectionIndex");
 
 			sequenceXml = sectionXml.getElement("sequences").getFirstChild;
 			while ( { sequenceXml != nil } , {
@@ -255,7 +255,7 @@ FileSaveController{
 					step.otherActionIndex = this.getIntValue(stepXml,"otherActionIndex");
 					step.setOtherActionGlobally = this.getIntValue(stepXml,"setOtherActionGlobally");
 					step.moveToSection = this.getIntValue(stepXml,"moveToSection");
-					step.moveSectionIndex = this.getIntValue(stepXml,"moveSectionIndex");
+					step.moveSectionId = this.getIntValue(stepXml,"moveSectionId");
 					step.otherActionValue = this.getFloatValue(stepXml,"otherActionValue");
 
 					//"LOAD NOTES".postln;

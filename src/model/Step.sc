@@ -25,7 +25,7 @@ Step{
 	var <> otherActionIndex;
 	var <> setOtherActionGlobally;
 	var <> moveToSection;
-	var <> moveSectionIndex;
+	var <> moveSectionId;
 	var <> otherActionValue;
 
 	var <> hitCounter;
@@ -59,7 +59,7 @@ Step{
 		otherActionIndex = 0;
 		setOtherActionGlobally = 0;
 		moveToSection = 0;
-		moveSectionIndex = 0;
+		moveSectionId = 0;
 		otherActionValue = 0;
 
 		hitCounter = 0;
