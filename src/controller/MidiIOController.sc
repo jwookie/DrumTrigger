@@ -9,6 +9,7 @@ MidiIOController{
 
 	var middleCVal;
 	var list_RampTasks;
+	var channels;
 
 	*new{|mainController|
 		^super.new.initMidiController(mainController);
@@ -22,6 +23,7 @@ MidiIOController{
 		middleCVal = 36;
 		list_RampTasks = List.new();
 		this.initMidi;
+		channels = Array.fill(16,{MidiChannel.new});
 
 	}
 
@@ -90,9 +92,16 @@ MidiIOController{
 				logger.debug(["NOTE ON",sendChan,midiNum]);
 				midiOut.noteOn(sendChan,midiNum,velocity);
 				notesPlayed.add(midiNum);
+				channels[sendChan].switchOn(midiNum);
 			});
 		};
 		sequence.currentMidiData = [sendChan,notesPlayed.asArray];
+		if(step.noteLength > 0,{
+			if(sequence.noteLengthTask != nil,{
+				sequence.noteLengthTask.stop;
+			});
+			this.createNoteLengthTask(sequence,step);
+		});
 
 		controller.setNoteIndicator(sequence);
 	}
@@ -125,10 +134,12 @@ MidiIOController{
 			});
 	}
 
+	//midi data is an array - [midiChan,[midiNotes..]]
 	stopMIDI{|midiData|
 		if(midiData != nil,{
 			midiData[1].do{arg val;
 				midiOut.noteOff(midiData[0],val);
+				channels[midiData[0]].switchOff(val);
 			}
 		});
 	}
@@ -145,6 +156,19 @@ MidiIOController{
 			});
 		});
 		triggerTask.start;
+	}
+
+	createNoteLengthTask{|sequence,step|
+		var lengthTask;
+		//creates a task that switches off the notes just played after a certain amount of time
+		lengthTask = Task({
+			1.do({
+				step.noteLength.wait;
+				this.stopMIDI(sequence.currentMidiData);
+			});
+		});
+		sequence.noteLengthTask = lengthTask;
+		sequence.noteLengthTask.start;
 	}
 
 	onMidiIn{|src,chan,num|
@@ -277,8 +301,8 @@ MidiIOController{
 				logger.debug(["MUTE SEQUENCE"]);
 				this.stopMIDI(sequence.currentMidiData);},
 			7,{
-				logger.debug(["MUTE CHANNEL"]);
-				//TODO..
+				logger.debug(["MUTE CHANNEL",step.otherActionValue,channels[step.otherActionValue].noteList.asArray]);
+				this.stopMIDI([step.otherActionValue-1,channels[step.otherActionValue-1].noteList.asArray]);
 			   },
 			8,{
 				logger.debug(["FADE OUT"]);
@@ -397,14 +421,18 @@ MidiIOController{
 	}
 
 	killMidi{
-		//logger.debug("KILL MIDI");
-		16.do{arg i;
-
-			127.do{arg j;
-				midiOut.noteOff(i,j);
-
-			}
+		var i = 0;
+		channels.do{arg val;
+			this.stopMIDI([i, val.noteList.asArray]);
+			i = i+1;
 		}
+		// 16.do{arg i;
+
+		// 	127.do{arg j;
+		// 		midiOut.noteOff(i,j);
+
+		// 	}
+		// }
 	}
 
 }

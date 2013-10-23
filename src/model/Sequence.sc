@@ -31,7 +31,7 @@ Sequence{
 
 	var <> tracker;
 
-	//var < triggerTask;
+	var <> noteLengthTask;
 	var <> triggerFlag;
 	var <> misfireTime;
 
