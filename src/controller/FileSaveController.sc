@@ -242,7 +242,7 @@ FileSaveController{
 					step.octave = this.getIntValue(stepXml,"octave");
 					step.useGlobalOctave = this.getIntValue(stepXml,"useGlobalOctave");
 					step.bypassSequence = this.getIntValue(stepXml,"bypassSequence");
-					step.noteLength = this.getIntValue(stepXml,"noteLength");
+					step.noteLength = this.getFloatValue(stepXml,"noteLength");
 					step.moveSequence = this.getIntValue(stepXml,"moveSequence");
 					step.numTrigHits = this.getIntValue(stepXml,"numTrigHits");
 					step.randomNote = this.getIntValue(stepXml,"randomNote");
