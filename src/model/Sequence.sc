@@ -22,7 +22,7 @@ Sequence{
 	var <> globalChannel;
 	var <> globalMidiIn;
 	var <> sequenceName;
-	//var <> sequenceIndex;
+	var <> description;
 
 	var <> currentMidiData;
 
@@ -49,6 +49,7 @@ Sequence{
 		logger =  Logger.new("Sequence");
 		//properties
 		sequenceName = name;
+		description = "Description of this sequence.";
 		//sequenceIndex = index;
 		midiTriggerNote = 0;
 		midiSendChan = 0;

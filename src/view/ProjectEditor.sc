@@ -13,6 +13,7 @@ ProjectEditor{
 	var < sequenceTitle;
 	var < sequenceNameText;
 	var < sequenceCombo;
+	var < sequenceDescriptionText;
 
 
 	//GUI positional vars
@@ -124,6 +125,13 @@ ProjectEditor{
 		Button.new(window,Rect(xpos+325, ypos+60, 60, 20))
 		.states_([ [ "Remove", Color(0.0, 0.0, 0.0, 1.0), Color(1.0, 0.0, 0.0, 1.0) ]])
 		.action_{|v| controller.removeSequence()};
+		//SEQUENCE DESCRIPTION
+		sequenceDescriptionText = TextView.new(window,Rect(xpos, ypos+85, 320, 50));
+		sequenceDescriptionText.keyUpAction_{|v|controller.saveSequenceDescription(v)};
+		//SAVE DESCRIPTION
+		/*Button.new(window,Rect(xpos+325, ypos+85, 60, 20))
+		.states_([ [ "Save", Color(0.0, 0.0, 0.0, 1.0), Color(1.0, 0.0, 0.0, 1.0) ]])
+		.action_{|v| controller.saveSequenceDescription()};*/
 
 	}
 

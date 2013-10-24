@@ -54,6 +54,7 @@ FileSaveController{
 
 				//add sequence properties
 				this.addCData(xml,sequenceRoot,"sequenceName",sequence.sequenceName);
+				this.addCData(xml,sequenceRoot,"sequenceDescription",sequence.description);
 				this.addCData(xml,sequenceRoot,"id",sequence.id);
 				this.addCData(xml,sequenceRoot,"midiTriggerNote",sequence.midiTriggerNote);
 				this.addCData(xml,sequenceRoot,"midiSendChan",sequence.midiSendChan);
@@ -213,7 +214,7 @@ FileSaveController{
 				newSequence = Sequence.new;
 				newSequence.sequenceName = sequenceXml.getElement("sequenceName").getFirstChild.getNodeValue;
 				logger.debug("Sequence:" + newSequence.sequenceName);
-				//newSequence.sequenceIndex = this.getIntValue(sequenceXml,"sequenceIndex");
+				newSequence.description = this.getTextValue(sequenceXml,"sequenceDescription");
 				newSequence.id = this.getIntValue(sequenceXml,"id");
 				newSequence.midiTriggerNote = this.getIntValue(sequenceXml,"midiTriggerNote");
 				newSequence.midiSendChan = this.getIntValue(sequenceXml,"midiSendChan");
@@ -304,6 +305,14 @@ FileSaveController{
 	createCData{|xml,name,val|
 		if(val == nil,{val = "NIL_VALUE"});
 		^xml.createElement(name).appendChild(xml.createCDATASection(val));
+	}
+
+	getTextValue{|xml,name|
+		if(xml.getElement(name) == nil,{
+			^"";
+		},{
+			^xml.getElement(name).getFirstChild.getNodeValue;
+		});
 	}
 
 	getIntValue{|xml,name|

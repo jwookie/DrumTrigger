@@ -408,9 +408,14 @@ TriggerController{
 		});
 	}
 
+	saveSequenceDescription{|description|
+		model.getCurrentSequence.description = gui.projectEditor.sequenceDescriptionText.string;
+	}
+
 	changeSequence{|sequenceIndex|
 		model.currentSequence = sequenceIndex;
 		this.updateSequenceTitle;
+		this.updateSequenceDescription;
 		this.applyNoteSettings;
 		this.setActiveSteps;
 		this.switchSteps(0);
@@ -425,6 +430,10 @@ TriggerController{
 	updateSequenceTitle{
 		logger.debug([model.getCurrentSequence,model.currentSequence,model.currentSection]);
 		{gui.projectEditor.sequenceTitle.string = model.getCurrentSequence.sequenceName}.defer;
+	}
+
+	updateSequenceDescription{
+		{gui.projectEditor.sequenceDescriptionText.string = model.getCurrentSequence.description}.defer;
 	}
 
 	updateSequenceCombos{
@@ -475,7 +484,7 @@ TriggerController{
 
 		gui.propertiesEditor.setOtherActionGlobalButton.value = model.getCurrentStep.setOtherActionGlobally;
 		gui.propertiesEditor.moveToSectionButton.value = model.getCurrentStep.moveToSection;
-		
+
 		gui.propertiesEditor.otherActionValueBox.value = model.getCurrentStep.otherActionValue;
 		if(model.getCurrentStep.otherActionIndex >= 7,{
 			gui.propertiesEditor.otherActionValueBox.visible = true;
