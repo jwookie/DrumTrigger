@@ -1,6 +1,6 @@
 MidiTracker{
 
-	var logger;
+	var trace;
 
 	var window;
 	var controller;
@@ -20,7 +20,7 @@ MidiTracker{
 
 	initMidiTracker{|initWindow,initController|
 
-		logger = Logger.new("MidiTracker");
+		trace = Trace.new("MidiTracker");
 		window = initWindow;
 		controller = initController;
 
@@ -38,7 +38,7 @@ MidiTracker{
 
 	addTrackers{|section|
 		var removeTracker;
-		//logger.debug("addTrackers "+section.sequenceList.size+' : '+trackers.size);
+		//trace.debug("addTrackers "+section.sequenceList.size+' : '+trackers.size);
 		section.sequenceList.do{arg val, i;
 			var newTracker;
 			if(i < trackers.size,{
@@ -61,7 +61,7 @@ MidiTracker{
 	}
 
 	updateTracker{|sequence|
-		//logger.debug(["UPDATE TRACKER",sequence.sequenceName,sequence.tracker,trackers,trackers.size]);
+		//trace.debug(["UPDATE TRACKER",sequence.sequenceName,sequence.tracker,trackers,trackers.size]);
 		sequence.tracker.setStepTracker(sequence.currentStep);
 	}
 

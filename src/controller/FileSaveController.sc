@@ -1,6 +1,6 @@
 FileSaveController{
 
-	var logger;
+	var trace;
 
 	var > model;
 	var controller;
@@ -11,7 +11,7 @@ FileSaveController{
 	}
 
 	initFileSaveController{|mainController|
-		logger = Logger.new("FileSaveController");
+		trace = Trace.new("FileSaveController");
 		controller = mainController;
 		saveAs = true;
 	}
@@ -21,7 +21,7 @@ FileSaveController{
 		if(name == "",{
 			^false;
 		});
-		logger.debug("Saving" + name ++ "...");
+		trace.debug("Saving" + name ++ "...");
 		filename = BumTrigger.static_XML_FOLDER_PATH ++ name ++ ".xml";
 		filename.postln;
 
@@ -34,7 +34,7 @@ FileSaveController{
 		this.addCData(xml,seed,"value",model.seedNumber);
 
 		sections = model.sectionList;
-		logger.debug(model.sectionList);
+		trace.debug(model.sectionList);
 		sections.do({arg section;
 			var sectionRoot,sequencesRoot;
 			sectionRoot = xml.createElement("section");
@@ -93,6 +93,7 @@ FileSaveController{
 					this.addCData(xml,stepRoot,"moveToSection",step.moveToSection);
 					this.addCData(xml,stepRoot,"moveSectionId",step.moveSectionId);
 					this.addCData(xml,stepRoot,"otherActionValue",step.otherActionValue);
+					this.addCData(xml,stepRoot,"otherActionAmount",step.otherActionAmount);
 
 					//now create note settings
 					notesRoot = xml.createElement("notes");
@@ -104,13 +105,13 @@ FileSaveController{
 			});
 		});
 
-		logger.debug("create file");
+		trace.debug("create file");
 		//now save file
 		file = File(filename, "w");
-		logger.debug("write file "+xml);
+		trace.debug("write file "+xml);
 		xml.write(file); // output to file with default formatting
 		file.close;
-		logger.debug("DONE");
+		trace.debug("DONE");
 
 		controller.setSongTitle(name);
 
@@ -191,7 +192,7 @@ FileSaveController{
 		if(seed != nil,{
 			model.setSeedNumber(this.getIntValue(seed,"value"));
 		});
-		logger.debug(["SEED",seed,"VAL",model.seedNumber]);
+		trace.debug(["SEED",seed,"VAL",model.seedNumber]);
 
 
 		//init new section list and names
@@ -213,7 +214,7 @@ FileSaveController{
 				var newSequence,stepXml,stepCtr,activeCtr;
 				newSequence = Sequence.new;
 				newSequence.sequenceName = sequenceXml.getElement("sequenceName").getFirstChild.getNodeValue;
-				logger.debug("Sequence:" + newSequence.sequenceName);
+				trace.debug("Sequence:" + newSequence.sequenceName);
 				newSequence.description = this.getTextValue(sequenceXml,"sequenceDescription");
 				newSequence.id = this.getIntValue(sequenceXml,"id");
 				newSequence.midiTriggerNote = this.getIntValue(sequenceXml,"midiTriggerNote");
@@ -258,6 +259,7 @@ FileSaveController{
 					step.moveToSection = this.getIntValue(stepXml,"moveToSection");
 					step.moveSectionId = this.getIntValue(stepXml,"moveSectionId");
 					step.otherActionValue = this.getFloatValue(stepXml,"otherActionValue");
+					step.otherActionAmount = this.getFloatValue(stepXml,"otherActionAmount");
 
 					//"LOAD NOTES".postln;
 					noteCtr = 0;
@@ -318,10 +320,10 @@ FileSaveController{
 	getIntValue{|xml,name|
 
 		if(xml.getElement(name) == nil,{
-			//logger.debug(name + "is NIL ! ");
+			//trace.debug(name + "is NIL ! ");
 			^0;
 			},{
-			//logger.debug(name + "is : "+xml.getElement(name).getFirstChild.getNodeValue);
+			//trace.debug(name + "is : "+xml.getElement(name).getFirstChild.getNodeValue);
 			^xml.getElement(name).getFirstChild.getNodeValue.asInteger;
 		});
 	}

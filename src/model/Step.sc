@@ -1,6 +1,6 @@
 Step{
 
-	var logger;
+	var trace;
 
 	var <> noteArray;
 	var <> editableProperties;
@@ -27,6 +27,7 @@ Step{
 	var <> moveToSection;
 	var <> moveSectionId;
 	var <> otherActionValue;
+	var <> otherActionAmount;
 
 	var <> hitCounter;
 
@@ -36,7 +37,7 @@ Step{
 	}
 
 	initStep{
-		logger = Logger.new("Step");
+		trace = Trace.new("Step");
 
 		//"STEP initStep".postln;
 		numMatrixKeys=24;
@@ -61,6 +62,7 @@ Step{
 		moveToSection = 0;
 		moveSectionId = 0;
 		otherActionValue = 0;
+		otherActionAmount = 0;
 
 		hitCounter = 0;
 

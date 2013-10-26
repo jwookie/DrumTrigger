@@ -1,6 +1,6 @@
 TriggerModel{
 
-	var logger ;
+	var trace ;
 
 	var <> currentSection;
 	var <> currentSequence;
@@ -21,7 +21,7 @@ TriggerModel{
 	}
 
 	initTriggerModel{|server|
-		logger = Logger.new("TriggerModel");
+		trace = Trace.new("TriggerModel");
 
 		numSteps = 16;
 		triggerChannel = 9;
@@ -46,13 +46,13 @@ TriggerModel{
 	//resetModel
 
 	setSeedNumber{|val|
-		logger.debug("setting seedNumber "+val);
+		trace.debug("setting seedNumber "+val);
 		seedNumber = val;
 	}
 
 
 	getSeedNumber{
-		logger.debug("getSeedNumber: "+seedNumber);
+		trace.debug("getSeedNumber: "+seedNumber);
 		seedNumber = seedNumber + 1;
 		^seedNumber;
 	}
@@ -100,7 +100,7 @@ TriggerModel{
 	getIndexFromListAndId{|list,id|
 	    var i = 0;
 		var index;
-	//logger.debug(["getIndexFromListAndId",list,list.size,id]);
+	//trace.debug(["getIndexFromListAndId",list,list.size,id]);
 		while{(index == nil) && (i < list.size)}
 		{
 			if(list[i].id == id,{

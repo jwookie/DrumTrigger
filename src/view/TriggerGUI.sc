@@ -1,6 +1,6 @@
 TriggerGUI{
 
-	var logger;
+	var trace;
 
 	var > controller;
 	var window;
@@ -35,7 +35,7 @@ TriggerGUI{
 
 	initTriggerGUI{|initController|
 
-		logger = Logger.new("TriggerGUI");
+		trace = Trace.new("TriggerGUI");
 		controller = initController;
 
 		//create the main window

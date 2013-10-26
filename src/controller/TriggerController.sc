@@ -1,6 +1,6 @@
 TriggerController{
 
-	var logger;
+	var trace;
 
 	var currentStep;
 	var > model;
@@ -22,7 +22,7 @@ TriggerController{
 
 	initTriggerController{
 
-		logger = Logger.new("TriggerController");
+		trace = Trace.new("TriggerController");
 		otherActionsArray =
 		[   "none",
 			"skip step",
@@ -34,7 +34,10 @@ TriggerController{
 			"mute channel",
 			"ramp out",
 			"ramp in",
-			"goto step"];
+			"goto step",
+			"+ pitch bend",
+			"- pitch bend",
+			"reset pitch"];
 
 		currentStepPlaying = 0;
 
@@ -79,7 +82,7 @@ TriggerController{
 	}
 
 	setNoteIndicator{|sequence|
-		logger.debug("SET NOTE INDICATOR");
+		trace.debug("SET NOTE INDICATOR");
 		gui.midiTracker.updateTracker(sequence);
 	}
 
@@ -247,7 +250,7 @@ TriggerController{
 
 	setOtherSequence{|sequenceIndex|
 		model.getCurrentStep.otherSequenceId = model.getCurrentSection.sequenceList[sequenceIndex].id;
-		logger.debug(["SETTING OTHER SEQ ID",sequenceIndex]);
+		trace.debug(["SETTING OTHER SEQ ID",sequenceIndex]);
 		model.getCurrentStep.useOtherSequenceGlobally.postln;
 		if(model.getCurrentStep.useOtherSequenceGlobally == 0,{
 			this.setGlobalOtherSequence(model.getCurrentStep.otherSequenceId);
@@ -255,7 +258,7 @@ TriggerController{
 	}
 
 	setUseOtherSequenceGlobally{|useOtherSequenceGlobal|
-		logger.debug(["setTriggerOtherSequenceGlobally ", useOtherSequenceGlobal]);
+		trace.debug(["setTriggerOtherSequenceGlobally ", useOtherSequenceGlobal]);
 		model.currentStep.postln;
 		model.getCurrentStep.postln;
 		model.getCurrentStep.useOtherSequenceGlobally.postln;
@@ -285,6 +288,11 @@ TriggerController{
 		},{
 			gui.propertiesEditor.otherActionValueBox.visible = false;
 		});
+		if(model.getCurrentStep.otherActionIndex >= 11,{
+			gui.propertiesEditor.otherActionAmountBox.visible = true;
+			},{
+				gui.propertiesEditor.otherActionAmountBox.visible = false;
+		});
 
 
 	}
@@ -305,6 +313,10 @@ TriggerController{
 		model.getCurrentStep.otherActionValue = value;
 	}
 
+	setOtherActionAmount{|value|
+		model.getCurrentStep.otherActionAmount = value;
+	}
+
 	setMoveToSection{|moveToSection|
 		model.getCurrentStep.moveToSection = moveToSection;
 	}
@@ -318,7 +330,7 @@ TriggerController{
 
 		var newIndex = model.sectionList.size;
 		var newSection = Section.new(sectionName);
-		logger.debug("addNewSection " + sectionName);
+		trace.debug("addNewSection " + sectionName);
 		newSection.id = model.getSeedNumber;
 		model.sectionList.add(newSection);
 		model.currentSection = newIndex;
@@ -356,7 +368,7 @@ TriggerController{
 	}
 
 	changeSection{|sectionIndex|
-		logger.debug(['CHANGE SECTION',sectionIndex]);
+		trace.debug(['CHANGE SECTION',sectionIndex]);
 		model.currentSection = sectionIndex;
 		{gui.projectEditor.sectionTitle.string = model.getCurrentSection.sectionName}.defer;
 		this.updateSequenceCombos;
@@ -372,7 +384,7 @@ TriggerController{
 	addNewSequence{|sequenceName|
 		var newIndex = model.getCurrentSection.sequenceList.size;
 		var newSequence = Sequence.new(sequenceName);//,newIndex)
-		logger.debug("addNewSequence " + sequenceName);
+		trace.debug("addNewSequence " + sequenceName);
 		newSequence.id = model.getSeedNumber;
 
 		model.getCurrentSection.sequenceList.add(newSequence);
@@ -389,7 +401,7 @@ TriggerController{
 
 	renameSequence{|sequenceName|
 		var seqIndex = model.getSequenceIndex(model.getCurrentSequence.id);
-		logger.debug("renameSequence "+sequenceName + ' '+seqIndex);
+		trace.debug("renameSequence "+sequenceName + ' '+seqIndex);
 		model.getCurrentSequence.sequenceName = sequenceName;
 		model.getCurrentSection.sequenceNames.put(seqIndex,sequenceName);
 
@@ -423,12 +435,12 @@ TriggerController{
 	}
 
 	updateMidiTrackers{
-	logger.debug("updateMidiTrackers");
+	trace.debug("updateMidiTrackers");
 		gui.midiTracker.addTrackers(model.getCurrentSection);
 	}
 
 	updateSequenceTitle{
-		logger.debug([model.getCurrentSequence,model.currentSequence,model.currentSection]);
+		trace.debug([model.getCurrentSequence,model.currentSequence,model.currentSection]);
 		{gui.projectEditor.sequenceTitle.string = model.getCurrentSequence.sequenceName}.defer;
 	}
 
@@ -491,13 +503,19 @@ TriggerController{
 			},{
 				gui.propertiesEditor.otherActionValueBox.visible = false;
 		});
+		gui.propertiesEditor.otherActionAmountBox.value = model.getCurrentStep.otherActionAmount;
+		if(model.getCurrentStep.otherActionIndex >= 11,{
+			gui.propertiesEditor.otherActionAmountBox.visible = true;
+			},{
+				gui.propertiesEditor.otherActionAmountBox.visible = false;
+		});
 
 		//get index of section to switch to
 		gui.propertiesEditor.moveToSectionCombo.value = model.getSectionIndex(model.getCurrentStep.moveSectionId);
 		//gui.propertiesEditor.moveToSectionCombo.value = model.getCurrentStep.moveSectionIndex;
 
 		// get index of other sequence
-		logger.debug("get index of other sequence");
+		trace.debug("get index of other sequence");
 		gui.propertiesEditor.otherSequenceCombo.value = model.getSequenceIndex(model.getCurrentStep.otherSequenceId);
 	}
 

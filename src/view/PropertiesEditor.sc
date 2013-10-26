@@ -1,6 +1,6 @@
 PropertiesEditor{
 
-	var logger;
+	var trace;
 
 	var window;
 	var controller;
@@ -31,6 +31,9 @@ PropertiesEditor{
 	var <> moveToSectionButton;
 	var <> moveToSectionCombo;
 	var <> otherActionValueBox;
+	var <> otherActionAmountBox;
+
+	var < detailsEditor;
 
 	var muteSequenceButton;//just for debug at the moment
 
@@ -52,7 +55,7 @@ PropertiesEditor{
 	}
 
 	initPropertiesEditor{|initWindow,initController|
-		logger = Logger.new("PropertiesEditor");
+		trace = Trace.new("PropertiesEditor");
 
 		window = initWindow;
 		controller = initController;
@@ -264,6 +267,95 @@ PropertiesEditor{
 
 	createTriggerOtherSequenceEditors{
 
+		var xpos = 5;
+		var ypos = 5;
+
+		detailsEditor = ScrollView.new(window,Rect(360, 285, 330, 255));
+		//detailsEditor.visible=false;
+
+	//TRIGGER OTHER SEQUENCE
+	StaticText.new(detailsEditor,Rect(xpos, ypos, 120, 20))
+	.string_("Trigger Other:")
+	.stringColor_(Color.black)
+	.action_{|v| };
+
+	triggerOtherSequenceButton = Button.new(detailsEditor,Rect(xpos+95, ypos, 40, 20))
+					.states_([ [ "Off", Color(0.0, 0.0, 0.0, 1.0), Color(1.0, 0.0, 0.0, 1.0) ],
+							[ "On", Color(1.0, 1.0, 1.0, 1.0), Color(0.0, 0.0, 1.0, 1.0) ] ])
+					.action_{|v|controller.setTriggerOtherSequence(v.value)};
+
+	"triggerOtherSequenceButton".postln;
+
+	triggerOtherSequenceGlobalButton = Button.new(detailsEditor,Rect(xpos+135, ypos, 20, 20))
+							.states_([ [ "", Color(0.0, 0.0, 0.0, 1.0), Color(1.0, 0.0, 0.0, 1.0) ],
+							[ "", Color(1.0, 1.0, 1.0, 1.0), Color(0.0, 0.0, 1.0, 1.0) ] ])
+							.action_{|v|controller.setTriggerOtherSequenceGlobally(v.value)};
+
+	"triggerOtherGlobalButton".postln;
+	//TRIGGER OTHER SEQUENCE COMBO
+	StaticText.new(detailsEditor,Rect(xpos, ypos+30, 120, 20))
+	.string_("Other Sequence:")
+	.stringColor_(Color.black)
+	.action_{|v| };
+
+	otherSequenceCombo = PopUpMenu.new(detailsEditor,Rect(xpos+110, ypos+30, 140, 20))
+	.stringColor_(Color.black)
+		.action_{|v| controller.setOtherSequence(v.value)};
+
+	setOtherSequenceGlobalButton = Button.new(detailsEditor,Rect(xpos+250, ypos+30, 20, 20))
+				.states_([ [ "", Color(0.0, 0.0, 0.0, 1.0), Color(1.0, 0.0, 0.0, 1.0) ],
+						[ "", Color(1.0, 1.0, 1.0, 1.0), Color(0.0, 0.0, 1.0, 1.0) ] ])
+				.action_{|v|controller.setUseOtherSequenceGlobally(v.value)};
+
+	"setOtherSeqGlobalButton".postln;
+	//OTHER TRIGGER ACTION COMBO
+	StaticText.new(detailsEditor,Rect(xpos, ypos+60, 120, 20))
+	.string_("Other Action:")
+	.stringColor_(Color.black);
+
+	otherActionsCombo = PopUpMenu.new(detailsEditor,Rect(xpos+95, ypos+60, 140, 20))
+	.stringColor_(Color.black)
+	.action_{|v| controller.setOtherAction(v.value)};
+
+	otherActionsCombo.items = controller.otherActionsArray;
+
+	setOtherActionGlobalButton = Button.new(detailsEditor,Rect(xpos+235, ypos+60, 20, 20))
+				.states_([ [ "", Color(0.0, 0.0, 0.0, 1.0), Color(1.0, 0.0, 0.0, 1.0) ],
+							[ "", Color(1.0, 1.0, 1.0, 1.0), Color(0.0, 0.0, 1.0, 1.0) ] ])
+		.action_{|v| controller.setUseOtherActionGlobally(v.value)};
+
+	otherActionValueBox = NumberBox.new(detailsEditor,Rect(xpos+260, ypos+60, 30, 20))
+		.action_{|v| controller.setOtherActionValue(v.value)};
+	otherActionValueBox.visible=false;
+
+	otherActionAmountBox = NumberBox.new(detailsEditor,Rect(xpos+260, ypos+85, 30, 20))
+	.action_{|v| controller.setOtherActionAmount(v.value)};
+	//otherActionAmount.visible=false;
+	}
+
+	createMoveToNextSectionEditors{
+	//MOVE TO NEXT SECTION
+	StaticText.new(window,Rect(stepSettingsXpos, stepSettingsYpos+230, 120, 20))
+	.string_("Change Section:")
+	.stringColor_(Color.black)
+	.action_{|v| };
+
+	moveToSectionButton = Button.new(window,Rect(stepSettingsXpos+120, stepSettingsYpos+230, 40, 20))
+			.states_([ [ "Off", Color(0.0, 0.0, 0.0, 1.0), Color(1.0, 0.0, 0.0, 1.0) ],
+			[ "On", Color(1.0, 1.0, 1.0, 1.0), Color(0.0, 0.0, 1.0, 1.0) ] ])
+		.action_{|v|	controller.setMoveToSection(v.value)};
+
+	moveToSectionCombo = PopUpMenu.new(window,Rect(210, stepSettingsYpos+230, 120, 20))
+	.stringColor_(Color.black)
+		.action_{|v| controller.setMoveSection(v.value)};
+
+	}
+
+	createOLDTriggerOtherSequenceEditors{
+
+		detailsEditor = ScrollView.new(window,Rect(360, 285, 330, 255));
+		detailsEditor.visible=false;
+
 	//TRIGGER OTHER SEQUENCE
 	StaticText.new(window,Rect(stepSettingsXpos, stepSettingsYpos+140, 120, 20))
 	.string_("Trigger Other:")
@@ -318,24 +410,6 @@ PropertiesEditor{
 	otherActionValueBox = NumberBox.new(window,Rect(stepSettingsXpos+260, stepSettingsYpos+200, 30, 20))
 		.action_{|v| controller.setOtherActionValue(v.value)};
 	otherActionValueBox.visible=false;
-	}
-
-	createMoveToNextSectionEditors{
-	//MOVE TO NEXT SECTION
-	StaticText.new(window,Rect(stepSettingsXpos, stepSettingsYpos+230, 120, 20))
-	.string_("Change Section:")
-	.stringColor_(Color.black)
-	.action_{|v| };
-
-	moveToSectionButton = Button.new(window,Rect(stepSettingsXpos+120, stepSettingsYpos+230, 40, 20))
-			.states_([ [ "Off", Color(0.0, 0.0, 0.0, 1.0), Color(1.0, 0.0, 0.0, 1.0) ],
-			[ "On", Color(1.0, 1.0, 1.0, 1.0), Color(0.0, 0.0, 1.0, 1.0) ] ])
-		.action_{|v|	controller.setMoveToSection(v.value)};
-
-	moveToSectionCombo = PopUpMenu.new(window,Rect(210, stepSettingsYpos+230, 120, 20))
-	.stringColor_(Color.black)
-		.action_{|v| controller.setMoveSection(v.value)};
-
 	}
 
 

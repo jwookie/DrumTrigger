@@ -2,7 +2,7 @@ Sequence{
 
 	classvar < static_NUM_STEPS=16;
 
-	var logger;
+	var trace;
 
 	var controller;
 	var model;
@@ -23,6 +23,8 @@ Sequence{
 	var <> globalMidiIn;
 	var <> sequenceName;
 	var <> description;
+
+	var <> pitchBendPosition;
 
 	var <> currentMidiData;
 
@@ -46,7 +48,7 @@ Sequence{
 	}
 
 	initSequence{|name,index|
-		logger =  Logger.new("Sequence");
+		trace =  Trace.new("Sequence");
 		//properties
 		sequenceName = name;
 		description = "Description of this sequence.";
@@ -65,22 +67,8 @@ Sequence{
 
 		triggerFlag = true;
 		misfireTime = 0.25;
-		//creates a task that prevents the sequence from misfiring
-		/*triggerTask = Task({
-			1.do({
-				triggerFlag = false;
-				0.25.wait;
-				triggerFlag = true;
-
-			});
-		});*/
-
-
+		pitchBendPosition = 0;
 	}
-
-	//getCurrentStep{
-		//^stepArray[currentStep];
-	//}
 
 	reset{
 		"SEQ RESET".postln;

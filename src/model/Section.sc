@@ -1,11 +1,11 @@
 Section{
 
-	var logger;
+	var trace;
 
 	var <> sequenceList;
 	var <> sequenceNames;
 	var <> sectionName;
-	
+
 	var <> id;
 
 	var < currentSequence;
@@ -16,13 +16,13 @@ Section{
 	}
 
 	initSection{|name,index|
-		logger = Logger.new("Section");
+		trace = Trace.new("Section");
 
 		sequenceList = List.new(0);
 		sequenceNames = List.new(0);
 
 		sectionName = name;
-		
+
 		currentSequence = 0;
 	}
 
