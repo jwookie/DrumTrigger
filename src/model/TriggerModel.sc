@@ -99,7 +99,7 @@ TriggerModel{
 
 	getIndexFromListAndId{|list,id|
 	    var i = 0;
-		var index;
+		var index = nil;
 	//trace.debug(["getIndexFromListAndId",list,list.size,id]);
 		while{(index == nil) && (i < list.size)}
 		{

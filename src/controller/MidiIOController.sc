@@ -181,6 +181,7 @@ MidiIOController{
 
 	onMidiIn{|src,chan,num|
 		if(chan == model.triggerChannel, {
+			var skipSectionId = nil;
 			trace.debug(["ON MIDI IN",model.ready,chan,num]);
 			if(model.ready == false,{^false;});
 			model.getCurrentSection.sequenceList.do{arg val;
@@ -218,17 +219,28 @@ MidiIOController{
 							this.performOtherTriggerAction(step);
 						});
 
+						trace.debug(["move to section?",step.moveToSection,step.moveSectionId]);
 						if(step.moveToSection == 1,{
-							trace.debug(["MOVING TO SECTION - "]);
-							controller.changeSection(model.getSectionIndex(step.moveSectionId));
+							//if skip section is set, save the id
+							//for after all the sequences have performed their actions
+							if(skipSectionId != nil,{
+								trace.error(["SKIP SECTION SET TWICE ! !"]);
+							});
+							skipSectionId = step.moveSectionId;
 						});
 					},{
 						//trigger misfiring
-						trace.debug(["--- MISFIRE ---",val.sequenceName]);
-					});
-				});
-			}
-		});
+						//trace.debug(["--- MISFIRE ---",val.sequenceName]);
+					});//end of trigger flag
+				});//end of midiTriggerNote
+			};//end of sequence list
+			trace.debug(["skip section?",skipSectionId]);
+			if(skipSectionId != nil,{
+				trace.debug(["- - - - - - MOVING TO SECTION - - - - - - - - - - - - - -  "]);
+				{controller.changeSection(model.getSectionIndex(skipSectionId))}.defer;
+			});
+
+		});//end of trigger channel
 
 	}
 
@@ -357,15 +369,18 @@ MidiIOController{
 	}
 
 	pitchBend{|direction,sequence,step|
+		//calulate value to send
+		var incVal = (MidiIOController.static_PITCH_MID*step.otherActionAmount)/step.otherActionValue;
 		var pitchBendVal;
-		var incVal;
 		//update pitch bend position
 		switch(direction,
 			"up",{
 				sequence.pitchBendPosition = sequence.pitchBendPosition + 1;
+				pitchBendVal = min(sequence.pitchBendPosition,step.otherActionValue) * incVal;
 			},
 			"down",{
 				sequence.pitchBendPosition = sequence.pitchBendPosition - 1;
+				pitchBendVal = max(sequence.pitchBendPosition,0-step.otherActionValue) * incVal;
 			},
 			"reset",{
 				sequence.pitchBendPosition = 0;
@@ -373,10 +388,7 @@ MidiIOController{
 				^"";//return
 			}
 		);
-		//calulate value to send
-		incVal = (MidiIOController.static_PITCH_MID*step.otherActionAmount)/step.otherActionValue;
-
-		pitchBendVal = min(sequence.pitchBendPosition,step.otherActionValue) * incVal;
+		trace.debug("pitch bend val "+pitchBendVal);
 		midiOut.bend(sequence.midiSendChan-1,MidiIOController.static_PITCH_MID + pitchBendVal);
 	}
 

@@ -42,6 +42,7 @@ FileSaveController{
 
 			//section properties
 			this.addCData(xml,sectionRoot,"sectionName",section.sectionName);
+			this.addCData(xml,sectionRoot,"id",section.id);
 			//this.addCData(xml,sectionRoot,"sectionIndex",section.sectionIndex);
 
 			//sequences in section
@@ -206,6 +207,7 @@ FileSaveController{
 			var newSection,sequenceXml;
 			newSection = Section.new;
 			newSection.sectionName = sectionXml.getElement("sectionName").getFirstChild.getNodeValue.postln;
+			newSection.id = this.getIntValue(sectionXml,"id");
 			//newSection.sectionIndex = this.getIntValue(sectionXml,"sectionIndex");
 
 			sequenceXml = sectionXml.getElement("sequences").getFirstChild;
@@ -214,7 +216,7 @@ FileSaveController{
 				var newSequence,stepXml,stepCtr,activeCtr;
 				newSequence = Sequence.new;
 				newSequence.sequenceName = sequenceXml.getElement("sequenceName").getFirstChild.getNodeValue;
-				trace.debug("Sequence:" + newSequence.sequenceName);
+				trace.debug("Sequence:" + newSequence.sequenceName+' '+this.getIntValue(sequenceXml,"id"));
 				newSequence.description = this.getTextValue(sequenceXml,"sequenceDescription");
 				newSequence.id = this.getIntValue(sequenceXml,"id");
 				newSequence.midiTriggerNote = this.getIntValue(sequenceXml,"midiTriggerNote");

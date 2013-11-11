@@ -322,7 +322,7 @@ TriggerController{
 	}
 
 	setMoveSection{|sectionIndex|
-
+		trace.debug(["set move to section id",sectionIndex,model.sectionList[sectionIndex],model.sectionList[sectionIndex].id]);
 		model.getCurrentStep.moveSectionId = model.sectionList[sectionIndex].id;
 	}
 
@@ -495,7 +495,7 @@ TriggerController{
 		gui.propertiesEditor.otherActionsCombo.value = model.getCurrentStep.otherActionIndex;
 
 		gui.propertiesEditor.setOtherActionGlobalButton.value = model.getCurrentStep.setOtherActionGlobally;
-		gui.propertiesEditor.moveToSectionButton.value = model.getCurrentStep.moveToSection;
+
 
 		gui.propertiesEditor.otherActionValueBox.value = model.getCurrentStep.otherActionValue;
 		if(model.getCurrentStep.otherActionIndex >= 7,{
@@ -510,9 +510,9 @@ TriggerController{
 				gui.propertiesEditor.otherActionAmountBox.visible = false;
 		});
 
+		gui.propertiesEditor.moveToSectionButton.value = model.getCurrentStep.moveToSection;
 		//get index of section to switch to
 		gui.propertiesEditor.moveToSectionCombo.value = model.getSectionIndex(model.getCurrentStep.moveSectionId);
-		//gui.propertiesEditor.moveToSectionCombo.value = model.getCurrentStep.moveSectionIndex;
 
 		// get index of other sequence
 		trace.debug("get index of other sequence");
